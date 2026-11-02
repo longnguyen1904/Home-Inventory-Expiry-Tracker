@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Kết nối Expo Go - Home Inventory Tracker</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #38bdf8;
+    }
+    .qr-container {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+      margin: 20px 0;
+    }
+    .qr-container img {
+      display: block;
+      width: 240px;
+      height: 240px;
+    }
+    .url-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #a5f3fc;
+      word-break: break-all;
+      margin: 15px 0;
+      user-select: all;
+    }
+    .steps {
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.03);
+      padding: 16px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    .steps ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #059669;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">● Đường hầm Tunnel đang HOẠT ĐỘNG</div>
+    <h1>Quét mã để mở trên App Expo Go</h1>
+    <p style="color: #94a3b8; font-size: 14px; margin: 0;">Không cần chung Wi-Fi, không bị tường lửa chặn</p>
+
+    <div class="qr-container">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=exp://wfh-ta8-longmoi-8081.exp.direct" alt="QR Code Expo Go" />
+    </div>
+
+    <div style="font-size: 13px; color: #94a3b8;">Hoặc nhập thủ công vào Expo Go:</div>
+    <div class="url-box">exp://wfh-ta8-longmoi-8081.exp.direct</div>
+
+    <div class="steps">
+      <strong>Hướng dẫn trên điện thoại:</strong>
+      <ol>
+        <li>Mở ứng dụng <strong>Expo Go</strong> trên điện thoại (Android hoặc iPhone).</li>
+        <li><strong>Với Android:</strong> Chọn <em>"Scan QR code"</em> rồi quét hình vuông mã QR ở trên.</li>
+        <li><strong>Với iPhone:</strong> Mở ứng dụng <em>Camera</em> của iPhone quét mã QR, hoặc vào Expo Go chọn <em>"Enter URL manually"</em> rồi dán link ở trên.</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>
+

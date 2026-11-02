@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Home Inventory & Expiry Tracker",
+    "slug": "home-inventory-expiry-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cho phép ứng dụng sử dụng camera để quét mã vạch sản phẩm."
+        }
+      ],
+      "expo-font",
+      "expo-status-bar"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

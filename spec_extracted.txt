@@ -1,0 +1,400 @@
+﻿TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM & THIẾT KẾ HỆ THỐNG
+DỰ ÁN: HOME INVENTORY & EXPIRY TRACKER (QUẢN LÝ TỦ THUỐC & VẬT PHẨM GIA ĐÌNH)
+Tên hệ thống
+Home Inventory & Expiry Tracker (SmartBox Mobile)
+Công nghệ sử dụng
+Frontend: React Native (Expo) | Backend: Node.js (Express.js) | Database: MongoDB
+Mục đích tài liệu
+Đặc tả toàn diện yêu cầu chức năng, phi chức năng, API và kiến trúc cơ sở dữ liệu làm đồ án môn học
+Trạng thái dự án
+Tài liệu Thiết kế & Phát triển Chi tiết (Full Specification)
+1. TỔNG QUAN DỰ ÁN & BỐI CẢNH
+Trong đời sống gia đình, việc tích trữ các loại thuốc không kê đơn (hạ sốt, cảm cúm, bông băng thuốc đỏ), mỹ phẩm, thực phẩm khô đóng hộp và hóa mỹ phẩm tẩy rửa là rất phổ biến. Tuy nhiên, phần lớn gia đình thường gặp phải các tình trạng:
+Quên hạn sử dụng: Thuốc hoặc thực phẩm chức năng hết hạn dùng nhưng không biết, gây nguy cơ ngộ độc hoặc ảnh hưởng nghiêm trọng đến sức khỏe khi sử dụng khẩn cấp.
+Lãng phí ngân sách: Mua lặp lại các loại thuốc, thực phẩm đóng gói do không nhớ trong tủ còn hay đã hết, hoặc đồ đạc bị để sâu trong ngăn tủ dẫn đến quá hạn phải vứt bỏ.
+Khó khăn khi tìm kiếm: Không nhớ rõ vị trí lưu trữ (tủ thuốc phòng khách, ngăn mát tủ lạnh, hộc tủ phòng ngủ), đặc biệt lúc có việc gấp hoặc ốm đau ban đêm.
+Thiếu thông tin tra cứu: Bao bì và tờ hướng dẫn sử dụng bị vứt bỏ, người dùng không nhớ rõ công dụng, liều dùng và chống chỉ định của thuốc.
+Dự án Home Inventory & Expiry Tracker được phát triển nhằm giải quyết triệt để các vấn đề trên thông qua nền tảng di động đa nền tảng kết hợp hệ thống backend tự động hóa, cung cấp cơ chế quét mã vạch nhận diện nhanh, quản lý không gian lưu trữ trực quan và hệ thống cảnh báo hạn dùng chủ động.
+2. KIẾN TRÚC HỆ THỐNG & CÔNG NGHỆ ÁP DỤNG
+Hệ thống được xây dựng theo mô hình Client-Server phân tầng (Layered Architecture), giao tiếp thông qua giao thức bảo mật RESTful API.
+Thành phần
+Công nghệ / Thư viện
+Vai trò & Trách nhiệm
+Mobile Client (Frontend)
+React Native (Expo / Bare CLI), TypeScript, React Navigation v6, Zustand/Redux Toolkit, Axios, Expo Barcode Scanner / Vision Camera
+Giao diện người dùng di động, quét barcode qua camera, quản lý state client, hiển thị biểu đồ và nhận thông báo đẩy FCM.
+Backend API Server
+Node.js (LTS), Express.js framework, JWT (JSON Web Tokens), bcryptjs, Joi / express-validator, node-cron, winston
+Cung cấp RESTful API, xác thực & phân quyền, xử lý nghiệp vụ kiểm kê, tác vụ chạy ngầm kiểm tra hạn dùng (Cron job).
+Database Management
+MongoDB Atlas / Local MongoDB, Mongoose ODM
+Lưu trữ dữ liệu dạng NoSQL Document linh hoạt (vật phẩm, vị trí lưu trữ, danh mục, lịch sử sử dụng, barcode library).
+Cloud & Third-Party
+Firebase Cloud Messaging (FCM), Cloudinary API, Open Food Facts API / Public Drug Barcode API
+Đẩy thông báo Notification tới thiết bị, lưu trữ và tối ưu hóa hình ảnh vật phẩm tải lên, tra cứu thông tin mã vạch toàn cầu.
+3. CÁC PHÂN HỆ CHỨC NĂNG CHI TIẾT (FUNCTIONAL SPECIFICATIONS)
+MOD-01: Phân hệ Xác thực & Quản lý Người dùng (Auth & Account Management)
+Đăng ký tài khoản (Register): Người dùng tạo tài khoản mới bằng Email và Mật khẩu. Hệ thống validate độ mạnh mật khẩu và mã hóa bằng bcrypt.
+Đăng nhập & Quản lý phiên (Login & JWT): Đăng nhập xác thực, cấp phát Access Token (JWT) và Refresh Token. Hỗ trợ lưu trữ an toàn Token trên thiết bị bằng SecureStore/EncryptedStorage.
+Quản lý Hồ sơ cá nhân (User Profile): Xem và cập nhật thông tin cá nhân: Họ tên, ảnh đại diện, đổi mật khẩu.
+Cấu hình ngưỡng thông báo (Notification Settings): Cho phép người dùng tự cấu hình mốc nhắc nhở hạn sử dụng (ví dụ: cảnh báo trước 30 ngày, 14 ngày, 7 ngày, 3 ngày hoặc 1 ngày).
+MOD-02: Phân hệ Quản lý Vị trí Lưu trữ & Không gian (Locations & Storage Spaces)
+Mô hình hóa không gian gia đình: Thiết lập cấu trúc cây phân cấp vị trí lưu trữ trong nhà: Tủ thuốc phòng khách, Hộp sơ cứu xe hơi, Tủ lạnh (Ngăn đông / Ngăn mát), Kệ bếp, Tủ quần áo.
+CRUD Vị trí lưu trữ: Thêm mới, sửa tên, biểu tượng (icon), màu sắc nhận diện và xóa vị trí lưu trữ (ràng buộc kiểm tra nếu vị trí đang chứa vật phẩm).
+Tổng quan vị trí: Hiển thị nhanh số lượng đồ vật đang lưu trữ trong từng vị trí và cảnh báo nhanh nếu vị trí đó có món sắp hết hạn.
+MOD-03: Phân hệ Nhập liệu & Quét Mã Vạch Thông Minh (Item Intake & Barcode Scanning)
+Quét Barcode / QR Code: Tích hợp Camera Scanner quét mã vạch EAN-13, UPC-A, Code 128. Nhận diện cực nhanh và phát tiếng beep/rung phản hồi.
+Tự động điền dữ liệu (Auto-fill): Khi quét được mã, hệ thống tự động tìm kiếm trong Barcode Catalog nội bộ hoặc gọi Open Data API. Nếu tìm thấy, tự động điền Tên, Nhà sản xuất, Hình ảnh mặc định.
+Nhập liệu thủ công chi tiết: Dành cho thuốc gia truyền hoặc vật phẩm không có barcode: Tên vật phẩm, Danh mục (Thuốc hạ sốt, Kháng sinh, Vitamin, Mỹ phẩm, Đồ khô), Số lượng, Đơn vị tính (vỉ, viên, hộp, tuýp, chai).
+Chụp ảnh & Đính kèm: Chụp trực tiếp ảnh bao bì hoặc tải từ thư viện ảnh máy, tự động nén và tải lên Cloudinary.
+Nhập Ngày sản xuất & Hạn sử dụng: Giao diện DatePicker trực quan. Tự động tính toán số ngày còn lại (Days Remaining) ngay khi chọn ngày.
+MOD-04: Phân hệ Quản lý Kho, Phân loại & Cảnh báo Trạng thái (Inventory & Expiry Tracking)
+Mã màu trạng thái trực quan: Hệ thống tự động tính toán và gắn nhãn theo thời gian thực: Đỏ (Đã hết hạn - Expired), Cam/Vàng (Sắp hết hạn trong vòng 7 - 30 ngày), Xanh lá (Còn hạn sử dụng an toàn).
+Bộ lọc & Sắp xếp đa tiêu chí: Lọc theo Vị trí, Lọc theo Danh mục, Lọc theo Trạng thái hạn dùng. Sắp xếp theo: Hạn gần nhất trước, Mới thêm vào, Tên từ A-Z.
+Tìm kiếm tức thời (Instant Search): Tìm kiếm theo từ khóa: Tên thương mại, Thành phần hoạt chất (ví dụ gõ 'Paracetamol' sẽ ra Efferalgan, Hapacol, Panadol).
+Cập nhật số lượng & Tiêu hao (Stock In/Out): Thao tác 1 chạm tăng/giảm số lượng khi sử dụng một phần. Đánh dấu 'Đã sử dụng hết' hoặc 'Đã hủy bỏ/Vứt rác'.
+MOD-05: Phân hệ Nhắc nhở & Tự động hóa Thông báo (Notifications & Cron Scheduler)
+Tác vụ quét ngầm định kỳ (Background Cron Job): Hàng ngày vào 08:00 AM, server Node.js chạy cron job quét cơ sở dữ liệu để tìm toàn bộ các vật phẩm chạm các mốc cảnh báo (VD: 30 ngày, 7 ngày, 1 ngày, ngày hết hạn).
+Thông báo đẩy đa thiết bị (FCM Push Notification): Gửi tin nhắn đẩy trực tiếp tới điện thoại của người dùng kèm tiêu đề và nội dung cảnh báo chi tiết.
+Trung tâm thông báo trong app (In-App Notification Center): Lưu trữ lịch sử tất cả các thông báo đã gửi, đánh dấu đã đọc/chưa đọc và cho phép bấm trực tiếp vào thông báo để chuyển tới chi tiết vật phẩm đó.
+MOD-06: Phân hệ Thống kê, Báo cáo & Lịch sử Tiêu dùng (Analytics & Reports)
+Dashboard tổng quan (Executive Dashboard): Thẻ thống kê tổng số vật phẩm đang quản lý, số lượng sắp hết hạn, số lượng đã quá hạn, tổng giá trị ước tính (nếu có nhập giá).
+Biểu đồ phân bố: Biểu đồ tròn (Pie Chart) tỷ lệ theo danh mục (Thuốc, Mỹ phẩm, Thực phẩm) và Biểu đồ cột biểu diễn số lượng vật phẩm hết hạn theo các tháng.
+Nhật ký tiêu hao (Activity Audit Log): Ghi lại nhật ký các hành động: Thêm mới, Chỉnh sửa, Dùng bớt số lượng, Vứt bỏ để phục vụ việc kiểm tra lại lịch sử.
+4. THIẾT KẾ CƠ SỞ DỮ LIỆU (MONGODB DATA MODELS)
+Dữ liệu được mô hình hóa theo cấu trúc MongoDB Collection với Mongoose Schema, sử dụng Index để tối ưu truy vấn theo người dùng và hạn sử dụng:
+User Schema (Collection: users)
+Tên Trường
+Kiểu dữ liệu
+Ràng buộc
+Mô tả nghiệp vụ
+_id
+ObjectId
+PK
+Khóa chính tự sinh
+email
+String
+Unique
+Email đăng nhập hệ thống, đánh index
+password
+String
+Required
+Mật khẩu đã mã hóa bcrypt
+fullName
+String
+Required
+Họ và tên người dùng
+avatarUrl
+String
+Optional
+Đường dẫn ảnh đại diện trên Cloudinary
+fcmToken
+String
+Optional
+FCM Device Token để push thông báo
+settings
+Object
+Optional
+Cấu hình ngày nhắc hạn: alertDays: [30, 7, 1]
+createdAt
+Date
+Default
+Thời điểm tạo tài khoản
+Location Schema (Collection: locations)
+Tên Trường
+Kiểu dữ liệu
+Ràng buộc
+Mô tả nghiệp vụ
+_id
+ObjectId
+PK
+Khóa chính tự sinh
+userId
+ObjectId
+FK
+Tham chiếu tới users._id (Index)
+name
+String
+Required
+Tên vị trí (VD: Tủ thuốc phòng khách)
+icon
+String
+Default
+Tên mã icon (medical-bag, fridge, etc.)
+color
+String
+Default
+Mã màu hex để render UI
+description
+String
+Optional
+Mô tả cụ thể vị trí trong phòng
+createdAt
+Date
+Default
+Thời điểm tạo
+Category Schema (Collection: categories)
+Tên Trường
+Kiểu dữ liệu
+Ràng buộc
+Mô tả nghiệp vụ
+_id
+ObjectId
+PK
+Khóa chính tự sinh
+name
+String
+Required
+Tên danh mục (Thuốc kháng sinh, Thực phẩm,...)
+type
+String
+Required
+Loại: MEDICINE | FOOD | COSMETIC | OTHER
+icon
+String
+Optional
+Icon đại diện
+isSystemDefault
+Boolean
+Default
+True nếu là danh mục mặc định của hệ thống
+Item Schema (Collection: items) - Trung tâm nghiệp vụ
+Tên Trường
+Kiểu dữ liệu
+Ràng buộc
+Mô tả nghiệp vụ
+_id
+ObjectId
+PK
+Khóa chính tự sinh
+userId
+ObjectId
+FK
+Tham chiếu tới users._id (Compound Index)
+locationId
+ObjectId
+FK
+Tham chiếu tới locations._id
+categoryId
+ObjectId
+FK
+Tham chiếu tới categories._id
+name
+String
+Required
+Tên thuốc hoặc vật phẩm (Text Index)
+barcode
+String
+Optional
+Mã vạch đã quét (Index)
+brand
+String
+Optional
+Nhãn hàng / Công ty dược phẩm
+activeIngredient
+String
+Optional
+Hoạt chất chính (VD: Paracetamol, Ibuprofen)
+quantity
+Number
+Default 1
+Số lượng hiện còn trong tủ
+unit
+String
+Required
+Đơn vị tính (viên, vỉ, chai, tuýp, hộp)
+mfgDate
+Date
+Optional
+Ngày sản xuất (Manufacturing Date)
+expiryDate
+Date
+Required
+Ngày hết hạn (Đánh Index để cron query nhanh)
+imageUrl
+String
+Optional
+Ảnh chụp vật phẩm lưu trữ trên cloud
+note
+String
+Optional
+Ghi chú cách dùng, liều dùng hàng ngày
+status
+String
+Indexed
+GOOD (Còn hạn) | EXPIRING_SOON | EXPIRED
+isArchived
+Boolean
+Default false
+True nếu đã dùng hết hoặc đã hủy bỏ
+Notification Schema (Collection: notifications)
+Tên Trường
+Kiểu dữ liệu
+Ràng buộc
+Mô tả nghiệp vụ
+_id
+ObjectId
+PK
+Khóa chính tự sinh
+userId
+ObjectId
+FK
+Tham chiếu tới users._id (Index)
+itemId
+ObjectId
+FK
+Tham chiếu tới items._id
+title
+String
+Required
+Tiêu đề thông báo cảnh báo
+message
+String
+Required
+Nội dung chi tiết (Số ngày còn lại)
+type
+String
+Required
+EXPIRY_WARNING | EXPIRED | SYSTEM
+isRead
+Boolean
+Default false
+Trạng thái đã đọc
+sentAt
+Date
+Default
+Thời gian thông báo được gửi
+5. ĐẶC TẢ GIAO DIỆN LẬP TRÌNH ỨNG DỤNG (RESTFUL API SPECIFICATIONS)
+Các endpoints được thiết kế theo đúng chuẩn RESTful API, sử dụng HTTP Status Codes chuẩn và trả về dữ liệu định dạng JSON đồng nhất.
+Method
+Endpoint URI
+Auth (JWT)
+Mô tả chức năng
+POST
+/api/v1/auth/register
+No
+Đăng ký tài khoản người dùng mới
+POST
+/api/v1/auth/login
+No
+Đăng nhập, trả về Access Token & Profile
+POST
+/api/v1/auth/fcm-token
+Yes
+Cập nhật Firebase Device Token của máy
+GET
+/api/v1/users/profile
+Yes
+Lấy thông tin tài khoản & thiết lập cá nhân
+PUT
+/api/v1/users/settings
+Yes
+Cập nhật cấu hình ngưỡng ngày báo hạn
+GET
+/api/v1/locations
+Yes
+Lấy danh sách vị trí lưu trữ kèm đếm item
+POST
+/api/v1/locations
+Yes
+Tạo mới vị trí tủ / kệ lưu trữ
+PUT
+/api/v1/locations/:id
+Yes
+Chỉnh sửa tên, icon, màu sắc vị trí
+DELETE
+/api/v1/locations/:id
+Yes
+Xóa vị trí (nếu không còn item trực thuộc)
+GET
+/api/v1/items
+Yes
+Lấy danh sách vật phẩm (Hỗ trợ lọc, tìm kiếm, phân trang)
+GET
+/api/v1/items/:id
+Yes
+Lấy chi tiết 1 vật phẩm
+POST
+/api/v1/items
+Yes
+Thêm mới vật phẩm vào kho
+PUT
+/api/v1/items/:id
+Yes
+Cập nhật thông tin / số lượng vật phẩm
+DELETE
+/api/v1/items/:id
+Yes
+Xóa hoặc Archive vật phẩm
+PATCH
+/api/v1/items/:id/consume
+Yes
+Tiêu hao nhanh 1 đơn vị số lượng
+GET
+/api/v1/barcodes/lookup/:code
+Yes
+Tra cứu thông tin theo mã vạch từ DB / bên thứ 3
+GET
+/api/v1/dashboard/statistics
+Yes
+Thống kê số lượng tổng, hết hạn, biểu đồ tròn
+GET
+/api/v1/notifications
+Yes
+Lấy danh sách thông báo cảnh báo
+PATCH
+/api/v1/notifications/:id/read
+Yes
+Đánh dấu thông báo đã đọc
+📌 CHUẨN PHẢN HỒI API: Chuẩn Response JSON chung của hệ thống:{  "success": true,  "message": "Thực hiện tác vụ thành công",  "data": { ... },  "timestamp": "2026-11-02T08:00:00.000Z"}
+6. THIẾT KẾ MÀN HÌNH ỨNG DỤNG (MOBILE UI/UX FLOW)
+Ứng dụng React Native được tổ chức luồng điều hướng mượt mà với 5 Tabs chính tại Bottom Navigation Bar cùng các màn hình con dạng Modal:
+Màn hình Splash & Đăng nhập / Đăng ký (Auth Screen): Thiết kế thanh lịch, có nút chuyển nhanh giữa Đăng nhập và Tạo tài khoản. Hỗ trợ ghi nhớ mật khẩu và auto-login bằng token hợp lệ.
+Màn hình Trang chủ & Bảng tin cảnh báo (Home / Dashboard): Trên cùng hiển thị thẻ cảnh báo khẩn cấp: 'Bạn có X vật phẩm đã hết hạn' (nền đỏ) và 'Y vật phẩm sắp hết hạn' (nền cam). Bên dưới là danh sách quick-access các vật phẩm cần chú ý nhất kèm thanh tiến trình hiển thị tỷ lệ hạn dùng.
+Màn hình Quét mã vạch (Barcode Scanner Modal): Màn hình mở camera toàn cảnh có khung chữ nhật căn góc quét, nút bật đèn Flash khi quét trong góc tối và nút 'Nhập tay' nếu mã vạch bị mờ không thể đọc.
+Màn hình Form Thêm / Sửa vật phẩm (Add / Edit Item Screen): Giao diện cuộn mượt: Ô chọn ảnh, ô quét mã, chọn Tên, Danh mục (dạng chip icon), chọn Vị trí lưu trữ, bộ đếm số lượng (+/- stepper) và DateTimePicker chọn ngày hết hạn.
+Màn hình Quản lý Kho & Bộ lọc (Inventory / Filter Screen): Thanh tìm kiếm tức thì ở trên cùng, hàng ngang chọn Filter theo Vị trí (Phòng khách, Bếp, Tủ lạnh), các thẻ tab trạng thái: Tất cả | Sắp hết hạn | Đã hết hạn | An toàn. Mỗi item có nút 3 chấm thao tác nhanh (Dùng 1 đơn vị, Chỉnh sửa, Xóa).
+Màn hình Vị trí lưu trữ (Storage Locations Screen): Hiển thị các khối Card đại diện cho các phòng/tủ kèm màu sắc trực quan, hiển thị tổng số item và cảnh báo riêng cho từng tủ.
+Màn hình Báo cáo thống kê & Cài đặt (Analytics & Settings): Biểu đồ tròn phân bố danh mục sản phẩm, cấu hình thời gian nhận thông báo (VD: chỉ nhận lúc 8:00 sáng), nút đăng xuất tài khoản.
+7. THUẬT TOÁN ĐẶC TẢ NGHIỆP VỤ & TỰ ĐỘNG HÓA
+7.1. Thuật toán xác định Trạng thái Hạn dùng (Real-time Expiry Status)
+Trạng thái của vật phẩm được tính toán động dựa trên chênh lệch giữa Ngày hiện tại (Current Date) và Ngày hết hạn (Expiry Date):
+DiffDays = (ExpiryDate - CurrentDate) / (1000 * 60 * 60 * 24) ➔ Tính toán số ngày còn lại theo mốc 00:00:00 UTC.
+Nếu DiffDays < 0: ➔ Trạng thái EXPIRED (Đã hết hạn - Màu Đỏ #EF4444).
+Nếu 0 <= DiffDays <= 30 (hoặc theo cấu hình alertDays của user): ➔ Trạng thái EXPIRING_SOON (Sắp hết hạn - Màu Vàng Cam #F59E0B).
+Nếu DiffDays > 30: ➔ Trạng thái GOOD (An toàn - Màu Xanh Lá #10B981).
+7.2. Luồng hoạt động của Tác vụ Cron Job Thông báo Hàng ngày
+Bước 1: Vào lúc 08:00 sáng hàng ngày theo múi giờ hệ thống (cron schedule: '0 8 * * *'), node-cron kích hoạt tác vụ service `checkExpiringItemsDaily()`.
+Bước 2: Server truy vấn danh sách người dùng đã bật thông báo và có lưu trữ FCM Token hợp lệ.
+Bước 3: Với mỗi người dùng, lấy cấu hình các mốc cảnh báo (mặc định: [30, 7, 3, 1, 0]).
+Bước 4: Dùng MongoDB Aggregation Pipeline truy vấn các item của user đó thỏa mãn: `isArchived: false` và `expiryDate` rơi đúng vào các mốc chênh lệch ngày quy định.
+Bước 5: Nếu tìm thấy danh sách item, gom nhóm (Group) thành 1 payload thông báo tóm tắt (để tránh spam hàng chục thông báo riêng lẻ): ví dụ 'Bạn có 3 loại thuốc sắp hết hạn trong 7 ngày tới! Hãy kiểm tra tủ thuốc'.
+Bước 6: Gửi payload qua Firebase Cloud Messaging Admin SDK tới `fcmToken` của máy người dùng đồng thời lưu 1 bản ghi vào collection `notifications`.
+8. YÊU CẦU PHI CHỨC NĂNG & TIÊU CHÍ BẢO VỆ ĐỒ ÁN (NON-FUNCTIONAL & GRADING)
+Tiêu chí phi chức năng
+Yêu cầu kỹ thuật chi tiết
+Hiệu năng (Performance)
+Thời gian quét mã vạch và nhận diện < 1 giây; Tốc độ tải dữ liệu danh sách item (phân trang 20 records) < 500ms; Ảnh tải lên được nén tự động dưới 300KB.
+Bảo mật (Security)
+Mật khẩu mã hóa Bcrypt 10 rounds; Toàn bộ API nghiệp vụ bắt buộc xác thực Bearer JWT; Sanitize dữ liệu đầu vào chống injection.
+Tính khả dụng & UX (Usability)
+Hỗ trợ Dark/Light Theme cơ bản; Xử lý trạng thái Loading Skeleton, Empty State (khi kho chưa có đồ) và xử lý lỗi mạng (Offline Toast) thân thiện.
+Khả năng mở rộng (Scalability)
+Kiến trúc code dạng mô-đun hóa: Backend chia rõ Controllers - Services - Models; Frontend tách biệt UI Components, Custom Hooks và API Layer.
+9. LỘ TRÌNH TRIỂN KHAI DỰ ÁN (PROJECT ROADMAP)
+📌 TIMELINE KHUYẾN NGHỊ: Lộ trình 4 tuần chuẩn mực phù hợp cho đồ án môn học hoặc kỳ thực tập chuyên sâu, đảm bảo hoàn thiện trọn vẹn cả Mobile Frontend và Backend Node.js.
+Giai đoạn
+Hạng mục chính
+Kết quả bàn giao (Deliverables)
+Tuần 1
+Thiết kế Hệ thống & Dựng khung Backend
+ERD Database MongoDB, khởi tạo Express server, hoàn thành Module Auth (JWT), CRUD Locations và CRUD Items cơ bản.
+Tuần 2
+Dựng Giao diện Mobile & Tích hợp Quét Barcode
+Khởi tạo Expo/React Native, cấu hình Navigation, tích hợp Barcode Scanner Camera, dựng form nhập liệu và kết nối API thêm/sửa item.
+Tuần 3
+Nghiệp vụ Hạn dùng & Tự động hóa Thông báo
+Cài đặt node-cron kiểm tra hạn, kết nối Firebase Cloud Messaging (FCM), màn hình lọc thông minh (Màu đỏ/vàng/xanh), trang Dashboard thống kê.
+Tuần 4
+Kiểm thử, Tối ưu hóa & Chuẩn bị Demo
+Xử lý edge-cases (mạng yếu, barcode lạ), tối ưu UI/UX, viết README hướng dẫn cài đặt và xuất slide báo cáo đồ án.
